@@ -1,11 +1,15 @@
 const loginForm = document.getElementById('welcome-form');
+const userNameInput = document.getElementById('username');
 const messagesSection = document.getElementById('messages-section');
 const messagesList = document.getElementById('messages-list');
 const addMessageForm = document.getElementById('add-messages-form');
-const userNameInput = document.getElementById('username');
 const messageContentInput = document.getElementById('message-content');
+const socket = io();
 
 let userName = '';
+
+socket.on('message', ({ author, content }) => addMessage(author, content))
+
 
 const login = (event) => {
     event.preventDefault();
@@ -34,14 +38,19 @@ const addMessage = (author, content) => {
 
 const sendMessage = (e) => {
     e.preventDefault();
-    if(!messageContentInput.value){
+
+    let messageContent = messageContentInput.value;
+
+    if(!messageContent.length){
         alert("Type message!");
         return;
     } else {
-        addMessage(userName, messageContentInput.value)
-        messageContentInput.value = ''
-    }
+        addMessage(userName, messageContent);
+        socket.emit('message', {author: userName, content: messageContent })
+        messageContentInput.value = '';
+    };
 };
+
 
 loginForm.addEventListener('submit', login);
 addMessageForm.addEventListener('submit', sendMessage);
