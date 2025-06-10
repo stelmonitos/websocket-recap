@@ -10,15 +10,17 @@ let userName = '';
 
 socket.on('message', ({ author, content }) => addMessage(author, content))
 
-
-const login = (event) => {
-    event.preventDefault();
+const login = (e) => {
+    e.preventDefault();
     if(!userNameInput.value){
         alert("Empty input!");
         return;
     } else {
         userName = userNameInput.value;
+        socket.emit('user', {user: userName, id: socket.id})
     }
+    socket.emit('message', {author: 'ChatBot', content: `<i>${userName} has joined the conversation!</i>`})
+
     loginForm.classList.remove('show');
     messagesSection.classList.add('show');
 }
@@ -28,7 +30,7 @@ const addMessage = (author, content) => {
     message.classList.add('message', 'message--received')
     if(author == userName){
         message.classList.add('message--self');
-    }
+    } 
     message.innerHTML = `
     <h3 class="message__author">${author === userName ? 'You' : author}</h3>
     <div class="message__content">${content}</div>    
